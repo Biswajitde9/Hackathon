@@ -7,7 +7,7 @@ import CreateEvent from './CreateEvent';
 import {db} from "../firebase-init";
 
 //Import all the required functions from fireStore
-import { collection, getDocs, where, query} from "firebase/firestore"; 
+import { collection, getDocs, where, query,deleteDoc} from "firebase/firestore"; 
 
 const Profile = ({ currentUser }) => {
   const [events, setEvents] = useState();
@@ -47,6 +47,36 @@ const Profile = ({ currentUser }) => {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
+
+// Function to delete an event
+const deleteEvent = async (eventId) => {
+  try {
+    const eventRef = collection(db, 'Events', eventId.toString());
+    await deleteDoc(eventRef);
+
+    // Fetch updated events data after deletion
+    fetchUpdatedEvents();
+  } catch (error) {
+    console.error('Error deleting event:', error);
+    // Handle error
+  }
+};
+
+// Fetch updated events data after deletion
+const fetchUpdatedEvents = () => {
+  // Call the function to fetch attended events data
+  fetchEventsData(currentUser.attended).then((eventsData) => {
+    console.log('Fetched attended events data:', eventsData);
+    setEvents(eventsData);
+  });
+
+  // Fetch self-managed events data
+  fetchEventsData(currentUser.events).then((eventsData) => {
+    console.log('Fetched managed events data:', eventsData);
+    setSelfEvents(eventsData);
+  });
+};
+
 
   useEffect(() => {
     // Call the function to fetch attended events data
@@ -104,7 +134,7 @@ const Profile = ({ currentUser }) => {
           <div className="row">
             {selfEvents && selfEvents.map((event, index) => (
               <div key={index} className="col-md-12 mb-4">
-                <Event event={event} />
+                <Event event={event} onDelete={deleteEvent}/>
               </div>
             ))}
           </div>
@@ -114,7 +144,7 @@ const Profile = ({ currentUser }) => {
           <div className="row">
             {events && events.map((event, index) => (
               <div key={index} className="col-md-12 mb-4">
-                <Event event={event} />
+                <Event event={event} onDelete={deleteEvent} />
               </div>
             ))}
           </div>

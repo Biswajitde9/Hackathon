@@ -53,7 +53,6 @@ const CreateEvent = ({ user }) => {
     }
   };
   
-
   const handleLocationChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -98,7 +97,7 @@ const CreateEvent = ({ user }) => {
   };
   return (
     <div className="container mt-5">
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label className="form-label">Event Name:</label>
           <input
@@ -233,7 +232,7 @@ const CreateEvent = ({ user }) => {
             </button>
             </div>
             <div className="mb-3">
-            <button type="submit" onSubmit={handleSubmit} className="btn btn-primary">
+            <button type="submit" className="btn btn-primary">
                 Create Event
             </button>
             </div>

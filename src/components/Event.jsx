@@ -1,6 +1,8 @@
 import React from 'react';
-
-const Event = ({ event }) => {
+import { db } from '../firebase-init';
+import { doc, deleteDoc } from 'firebase/firestore';
+const Event = ({ event,onDelete }) => {
+  console.log('Event data',event);
   const {
     name,
     desc,
@@ -19,6 +21,20 @@ const Event = ({ event }) => {
   const statusTextArray = ['PLANNED', 'DELAYED', 'STARTED', 'ENDED', 'CANCELLED'];
   const statusText = statusTextArray[status] || 'UNKNOWN';
 
+  const handleDelete = async () => {
+    try {
+      // Delete the event from the database
+      const eventDocRef = doc(db, 'Events', event.uid);
+      await deleteDoc(eventDocRef);
+
+      // Trigger the onDelete callback to update the state in the parent component
+      onDelete(event.uid);
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      // Handle error
+    }
+  };
+
   return (
     <div className="container mt-4">
       <div className="row">
@@ -29,6 +45,7 @@ const Event = ({ event }) => {
                 <img src={url}  style={{maxHeight:"280px",maxWidth:"250px",objectFit:"contain"}} alt={`Media ${index + 1}`} className="img-fluid" />
               </li>
             ))}
+            <button onClick={handleDelete} className="btn btn-danger mt-4">x</button>
           </ul>
         </div>
         <div className="col-12 col-sm-8">
